@@ -2,197 +2,58 @@
   <div id="app">
     <form class="form"
       @submit.prevent="submitForm">
-      <div class="form__data">
-        <h3>Основные данные</h3>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="surname">Фамилия* <input class="form-group__input"
-              id="surname"
-              type="text"
-              v-model="basicInfo.surname"
-              required></label>
+      <div class="form__data"
+        v-for="item of formData"
+        :key="item.name">
 
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="name">Имя* <input class="form-group__input"
-              id="name"
-              type="text"
-              v-model="basicInfo.name"
-              required></label>
+        <h3>{{ item.name }}</h3>
 
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="patronymic">Отчество <input class="form-group__input"
-              id="patronymic"
-              type="text"
-              v-model="basicInfo.patronymic"></label>
+        <div class="form-group"
+          v-for="(input, key) in item.inputs"
+          :key="key">
+          <label v-if="input.type == 'text' || input.type == 'date' || input.type == 'checkbox'"
+            class="form-group__label"
+            :for="key">{{ input.label }}<input class="form-group__input"
+              :placeholder="input.placeholder"
+              :id="key"
+              :type="input.type"
+              v-model="item.inputs[key].value"
+              :required="!!input?.required"></label>
 
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="birthdate">Дата рождения* <input class="form-group__input"
-              id="birthdate"
-              type="date"
-              v-model="basicInfo.birthdate"
-              required></label>
+          <label v-else-if="key == 'gender'"
+            class="form-group__label">Пол:
+            <label class="form-group__label"
+              for="male">Мужской <input class="form-group__input-radio"
+                type="radio"
+                id="male"
+                value="male"
+                v-model="item.inputs[key].value"></label>
 
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="phone">Номер телефона* +7<input class="form-group__input"
-              id="phone"
-              type="text"
-              v-model="basicInfo.phoneNumber"
-              @blur="$v.phoneNumber.$touch()"></label>
+            <label class="form-group__label"
+              for="female">Женский <input class="form-group__input-radio"
+                type="radio"
+                id="female"
+                value="female"
+                v-model="item.inputs[key].value"></label>
+          </label>
 
-          <span v-if="$v.phoneNumber.$error"
-            class="error-message">Введите корректный номер телефона</span>
-        </div>
-        <div class="form-group">
-          <label class="form-group__label">Пол</label>
+          <label v-else-if="input.type == 'select'"
+            class="form-group__label">{{ input.label }}
+            <select class="form-group__select"
+              v-model="item.inputs[key].value"
+              :id="key"
+              :multiple="!!input?.multiple"
+              :required="!!input?.required">
+              <option v-for="option of input.options"
+                :key="option"
+                :value="option">{{ option }}</option>
+            </select>
 
-          <label class="form-group__label"
-            for="male">Мужской <input class="form-group__input"
-              type="radio"
-              id="male"
-              value="male"
-              v-model="basicInfo.gender"></label>
+          </label>
 
-          <label class="form-group__label"
-            for="female">Женский <input class="form-group__input"
-              type="radio"
-              id="female"
-              value="female"
-              v-model="basicInfo.gender"></label>
-        </div>
-        <div class="form-group">
-          <label class="form-group__label">Группа клиентов*</label>
-          <select v-model="basicInfo.customerGroup"
-            multiple
-            required>
-            <option value="VIP">VIP</option>
-            <option value="Проблемные">Проблемные</option>
-            <option value="ОМС">ОМС</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-group__label">Лечащий врач</label>
-          <select v-model="basicInfo.doctor">
-            <option value="Иванов">Иванов</option>
-            <option value="Захаров">Захаров</option>
-            <option value="Чернышева">Чернышева</option>
-          </select>
-        </div>
-        <div class="form-group">
 
-          <label class="form-group__label"
-            for="noSms">Не отправлять СМС <input class="form-group__input"
-              type="checkbox"
-              id="noSms"
-              v-model="basicInfo.noSms"></label>
-        </div>
-      </div>
-
-      <div class="form__data">
-        <h3>Адрес данные</h3>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="index">Индекс: <input class="form-group__input"
-              id="index"
-              type="text"
-              v-model="address.index"></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="country">Страна: <input class="form-group__input"
-              id="country"
-              type="text"
-              v-model="address.country"></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="region">Область: <input class="form-group__input"
-              id="region"
-              type="text"
-              v-model="address.region"></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="city">Город*: <input class="form-group__input"
-              id="city"
-              type="text"
-              v-model="address.city"
-              required></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="street">Улица: <input class="form-group__input"
-              id="street"
-              type="text"
-              v-model="address.street"></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="house">Дом: <input class="form-group__input"
-              id="house"
-              type="text"
-              v-model="address.house"></label>
-
-        </div>
-      </div>
-
-      <div class="form__data">
-        <h3>Паспортные данные</h3>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="documentType">Тип документа*:</label>
-          <select id="documentType"
-            v-model="passport.documentType"
-            required>
-            <option value="Паспорт">Паспорт</option>
-            <option value="Свидетельство о рождении">Свидетельство о рождении</option>
-            <option value="Вод. удостоверение">Вод. удостоверение</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="series">Серия: <input class="form-group__input"
-              id="series"
-              type="text"
-              v-model="passport.series"></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="number">Номер: <input class="form-group__input"
-              id="number"
-              type="text"
-              v-model="passport.number"></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="issuedBy">Кем выдан: <input class="form-group__input"
-              id="issuedBy"
-              type="text"
-              v-model="passport.issuedBy"></label>
-
-        </div>
-        <div class="form-group">
-          <label class="form-group__label"
-            for="issueDate">Дата выдачи*: <input class="form-group__input"
-              id="issueDate"
-              type="date"
-              v-model="passport.issueDate"
-              required></label>
-
+          <!-- <span v-if="$v[key].$error"
+            class="error-message">{{ input.errorMessage }}</span> -->
         </div>
       </div>
 
@@ -203,36 +64,48 @@
 
 <script>
 import { required, maxLength, numeric } from 'vuelidate/lib/validators';
+import Vue from 'vue';
 
 export default {
   data() {
     return {
-      basicInfo: {
-        surname: '',
-        name: '',
-        patronymic: '',
-        birthdate: '',
-        phoneNumber: '',
-        gender: '',
-        customerGroup: [],
-        doctor: '',
-        noSms: false
-      },
-      address: {
-        index: '',
-        country: '',
-        region: '',
-        city: '',
-        street: '',
-        house: ''
-      },
-      passport: {
-        documentType: '',
-        series: '',
-        number: '',
-        issuedBy: '',
-        issueDate: ''
-      }
+      formData: Vue.observable({
+        basicInfo: Vue.observable({
+          name: 'Основные данные',
+          inputs: {
+            surname: { type: 'text', value: '', errorMessage: "", label: 'Фамилия*:', required: true, placeholder: 'Иванов' },
+            name: { type: 'text', value: '', errorMessage: "", label: 'Имя*:', required: true, placeholder: 'Иван' },
+            patronymic: { type: 'text', value: '', errorMessage: "", label: 'Отчество:', placeholder: 'Иванович' },
+            birthdate: { type: 'date', value: '', errorMessage: "", label: 'День рождения*:', required: true },
+            phoneNumber: { type: 'text', value: '', errorMessage: "", label: 'Номер телефона*: +7', required: true, placeholder: '8005550505' },
+            gender: { type: 'radio', value: '', label: 'Пол:' },
+            customerGroup: { type: 'select', options: ['VIP', 'Проблемные', 'ОМС'], value: [], errorMessage: "", label: 'Группа клиентов*:', multiple: true },
+            doctor: { type: 'select', options: ['Иванов', 'Захаров', 'Чернышева'], value: '', errorMessage: "", label: 'Лечящий врач:' },
+            noSms: { type: 'checkbox', value: false, label: 'Не отправлять СМС:' }
+          }
+        }),
+        address: Vue.observable({
+          name: 'Адресные данные',
+          inputs: {
+            index: { type: 'text', value: '', errorMessage: "", label: 'Индекс:', placeholder: '123456' },
+            country: { type: 'text', value: '', errorMessage: "", label: 'Страна:', placeholder: 'Россия' },
+            region: { type: 'text', value: '', errorMessage: "", label: 'Регион:', placeholder: 'Россиская Федерация' },
+            city: { type: 'text', value: '', errorMessage: "", label: 'Город*:', required: true, placeholder: 'Москва' },
+            street: { type: 'text', value: '', errorMessage: "", label: 'Улица:', placeholder: 'Пушкина' },
+            house: { type: 'text', value: '', errorMessage: "", label: 'Дом:', placeholder: '11а' }
+          }
+        }),
+        passport: Vue.observable({
+          name: 'Паспортные данные',
+          inputs: {
+            documentType: { type: 'select', options: ['Паспорт', 'Свидетельство о рождении', 'Вод.удостоверение'], value: '', errorMessage: "", label: 'Тип документа:' },
+            series: { type: 'text', value: '', errorMessage: "", label: 'Серия:', placeholder: '7720' },
+            number: { type: 'text', value: '', errorMessage: "", label: 'Номер:', placeholder: '1234 1234 123456' },
+            issuedBy: { type: 'text', value: '', errorMessage: "", label: 'Кем выдан:', placeholder: 'МВД РОССИИ' },
+            issueDate: { type: 'date', value: '', errorMessage: "", label: 'Дата выдачи*:', required: true }
+          }
+        })
+      })
     };
   },
   methods: {
@@ -248,34 +121,48 @@ export default {
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: rgb(54, 54, 54);
   padding-bottom: 5rem;
   padding-top: 5rem;
   background-color: rgb(168, 187, 190);
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
+
+
 
 .form {
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 2rem;
-  margin: auto;
-  width: 40rem;
-  background-color: rgb(197, 210, 212);
+  background-color: rgb(233, 233, 233);
 
-  @media screen and (max-width: 620px) {
-    width: 80%;
+
+  @media screen and (min-width: 720px) {
+    width: 60%;
   }
 
-  @media screen and (max-width: 620px) {
-    width: 80%;
+  @media screen and (min-width: 1080px) {
+    width: 50%;
   }
+
+  @media screen and (min-width: 1080px) {
+    width: 45%;
+  }
+
 
   border-radius: 1rem;
   box-shadow: 0px 1px 8px 0px black;
+
+  &__data {
+    margin-bottom: 1rem;
+  }
 
   &-group {
     display: flex;
@@ -284,12 +171,29 @@ export default {
     margin-right: 3rem;
     margin-bottom: 1rem;
 
+    @media screen and (min-width: 320px) {
+      margin-right: 1rem;
+    }
+
     &__label {
       display: inline-flex;
       justify-content: flex-end;
-      align-items: center;
+      font-weight: bold;
       margin-bottom: 1rem;
       width: 100%;
+      text-wrap: nowrap;
+
+      &>& {
+        margin: 0;
+        width: 30%;
+        justify-content: start;
+        margin-left: 1rem;
+      }
+
+      input[type=checkbox] {
+        width: 20px;
+        margin-right: 50%;
+      }
     }
 
     &__input {
@@ -297,11 +201,29 @@ export default {
       padding-right: .5rem;
       padding-top: .2rem;
       padding-bottom: .2rem;
-      border-radius: .2rem;
+      border-radius: .3rem;
       border: 1px solid gray;
       width: 60%;
       margin-left: 1rem;
       height: 1.3rem;
+      font-size: medium;
+      background-color: white;
+
+      &:focus-visible {
+        outline: 2px solid black;
+      }
+    }
+
+    &__select {
+      padding-left: .5rem;
+      padding-right: .5rem;
+      padding-top: .2rem;
+      padding-bottom: .2rem;
+      margin-left: 1rem;
+      overflow: auto;
+      width: 63%;
+      border-radius: .3rem;
+      font-size: medium;
 
       &:focus-visible {
         outline: 2px solid black;
