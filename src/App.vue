@@ -20,7 +20,7 @@
               v-model="input.value"
               :required="!!input?.required"
               @blur="input.validation && $v.formData[key].inputs[inputKey].$touch()"
-              @input="input?.realType && onlyNumber(input)"></label>
+              @input="() => allowance(input)"></label>
 
           <label v-else-if="inputKey == 'gender'"
             class="form-group__label">Пол:
@@ -78,7 +78,6 @@
 <script>
 import { required, maxLength, minLength, numeric, } from 'vuelidate/lib/validators';
 import Vue from 'vue';
-import { alpha } from 'vuelidate/lib/validators';
 
 export default {
   data() {
@@ -87,9 +86,9 @@ export default {
         basicInfo: Vue.observable({
           name: 'Основные данные',
           inputs: {
-            surname: { type: 'text', value: '', errorMessage: "", label: 'Фамилия*:', required: true, placeholder: 'Иванов', validation: true },
-            name: { type: 'text', value: '', errorMessage: "", label: 'Имя*:', required: true, placeholder: 'Иван', validation: true },
-            patronymic: { type: 'text', value: '', errorMessage: "", label: 'Отчество:', placeholder: 'Иванович' },
+            surname: { type: 'text', value: '', errorMessage: "", label: 'Фамилия*:', required: true, placeholder: 'Иванов', validation: true, realType: 'string' },
+            name: { type: 'text', value: '', errorMessage: "", label: 'Имя*:', required: true, placeholder: 'Иван', validation: true, realType: 'string' },
+            patronymic: { type: 'text', value: '', errorMessage: "", label: 'Отчество:', placeholder: 'Иванович', realType: 'string' },
             birthdate: { type: 'date', value: '', errorMessage: "", label: 'День рождения*:', required: true, validation: true },
             phoneNumber: { type: 'text', value: '', errorMessage: "", label: 'Номер телефона*: +7', required: true, placeholder: '8005550505', validation: true, realType: 'number' },
             gender: { type: 'radio', value: '', label: 'Пол:' },
@@ -102,9 +101,9 @@ export default {
           name: 'Адресные данные',
           inputs: {
             index: { type: 'text', value: '', errorMessage: "", label: 'Индекс:', placeholder: '123456', realType: 'number' },
-            country: { type: 'text', value: '', errorMessage: "", label: 'Страна:', placeholder: 'Россия' },
-            region: { type: 'text', value: '', errorMessage: "", label: 'Регион:', placeholder: 'Россиская Федерация' },
-            city: { type: 'text', value: '', errorMessage: "", label: 'Город*:', required: true, placeholder: 'Москва', validation: true },
+            country: { type: 'text', value: '', errorMessage: "", label: 'Страна:', placeholder: 'Россия', realType: 'string' },
+            region: { type: 'text', value: '', errorMessage: "", label: 'Регион:', placeholder: 'Россиская Федерация', realType: 'string' },
+            city: { type: 'text', value: '', errorMessage: "", label: 'Город*:', required: true, placeholder: 'Москва', validation: true, realType: 'string' },
             street: { type: 'text', value: '', errorMessage: "", label: 'Улица:', placeholder: 'Пушкина' },
             house: { type: 'text', value: '', errorMessage: "", label: 'Дом:', placeholder: '11а' }
           }
@@ -115,7 +114,7 @@ export default {
             documentType: { type: 'select', options: ['Паспорт', 'Свидетельство о рождении', 'Вод.удостоверение'], value: '', errorMessage: "", label: 'Тип документа:' },
             series: { type: 'text', value: '', errorMessage: "", label: 'Серия:', placeholder: '7720', realType: 'number' },
             number: { type: 'text', value: '', errorMessage: "", label: 'Номер:', placeholder: '1234 1234 123456', realType: 'number' },
-            issuedBy: { type: 'text', value: '', errorMessage: "", label: 'Кем выдан:', placeholder: 'МВД РОССИИ' },
+            issuedBy: { type: 'text', value: '', errorMessage: "", label: 'Кем выдан:', placeholder: 'МВД РОССИИ', realType: 'string' },
             issueDate: { type: 'date', value: '', errorMessage: "", label: 'Дата выдачи*:', required: true, validation: true }
           }
         })
@@ -126,11 +125,14 @@ export default {
     submitForm() {
       console.log('Отправка формы', this.formData);
     },
-    onlyNumber(input) {
-      if (!input.value.match(/^\d{1,}$/g)) {
-        input.value = input.value.match(/\d{1,10}/g)?.reduce((acc, cv) => acc + cv, '') || '';
+    allowance(input) {
+      console.log('ok')
+      if (input.realType == 'number') {
+        input.value = input.value.replace(/\D+/g, '').match(/\d{1,10}/);
+      } else if (input.realType == 'string') {
+        input.value = input.value.match(/\p{L}+/iu)
       }
-    }
+    },
   },
   validations: {
     formData: {
@@ -139,8 +141,8 @@ export default {
           phoneNumber: {
             value: { required, maxLength: maxLength(10), minLength: minLength(10), numeric }
           },
-          surname: { value: { required, alpha } },
-          name: { value: { required, alpha } },
+          surname: { value: { required } },
+          name: { value: { required } },
           birthdate: { value: { required } },
           customerGroup: { value: { required: value => !!value.length } }
         }
