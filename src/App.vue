@@ -60,7 +60,7 @@
               <span v-if="!$v.formData[key].inputs[inputKey].value.required"
                 class="error__message">*Поле обязательное для заполнения.</span>
               <span
-                v-else-if="!$v.formData[key].inputs[inputKey].value.minLength || !$v.formData[key].inputs[inputKey].value.maxLength && inputKey == 'phoneNumber'">
+                v-else-if="(!$v.formData[key].inputs[inputKey].value.minLength || !$v.formData[key].inputs[inputKey].value.maxLength) && inputKey == 'phoneNumber'">
                 Поле должно содержать 10 цифр
               </span>
             </span>
