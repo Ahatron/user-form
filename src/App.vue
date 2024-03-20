@@ -124,15 +124,13 @@ export default {
   methods: {
     submitForm() {
       console.log('Отправка формы', this.formData);
+      this.$v.$touch()
     },
-    allowance(input, key) {
-      console.log('ok')
+    allowance(input) {
       if (input.realType == 'number') {
-        let replaceValue = input.value.replace(/\D+/g, '')
-        console.log(key, replaceValue)
-        if (key == 'phoneNumber') replaceValue = replaceValue.match(/\d{1,10}/);
-        input.value = replaceValue
-      } else if (input.realType == 'string') {
+        input.value = input.value.replace(/\D+/g, '')
+      }
+      else if (input.realType == 'string') {
         input.value = input.value.match(/\p{L}+/iu)
       }
     },
