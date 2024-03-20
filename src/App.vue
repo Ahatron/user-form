@@ -20,7 +20,7 @@
               v-model="input.value"
               :required="!!input?.required"
               @blur="input.validation && $v.formData[key].inputs[inputKey].$touch()"
-              @input="() => allowance(input)"></label>
+              @input="() => allowance(input, inputKey)"></label>
 
           <label v-else-if="inputKey == 'gender'"
             class="form-group__label">Пол:
@@ -125,10 +125,13 @@ export default {
     submitForm() {
       console.log('Отправка формы', this.formData);
     },
-    allowance(input) {
+    allowance(input, key) {
       console.log('ok')
       if (input.realType == 'number') {
-        input.value = input.value.replace(/\D+/g, '').match(/\d{1,10}/);
+        let replaceValue = input.value.replace(/\D+/g, '')
+        console.log(key, replaceValue)
+        if (key == 'phoneNumber') replaceValue = replaceValue.match(/\d{1,10}/);
+        input.value = replaceValue
       } else if (input.realType == 'string') {
         input.value = input.value.match(/\p{L}+/iu)
       }
